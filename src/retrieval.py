@@ -38,8 +38,7 @@ def retrieve_documents(retriever, query):
         logger.info(f"Retrieved {len(documents)} documents for query: {query}")
         return [{"content": doc.page_content,
                 "metadata": doc.metadata,
-                "score": getattr(doc, "score", None)}
-            for doc in documents]
+                "score": getattr(doc, "score", None)} for doc in documents]
     except Exception as e:
         logger.error(f"Error retrieving documents: {str(e)}")
         raise
