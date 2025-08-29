@@ -19,7 +19,7 @@ def load_documents(data_dir, file_types=[".pdf",".txt"]):
         documents = []
         for file_type in file_types:
             if file_type == ".pdf":
-                loader = PyPDFDirectoryLoader(data_dir)
+                loader = PyPDFDirectoryLoader(data_dir = "data\Introduction to Machine Learning with Python ( PDFDrive ).pdf")
                 documents.extend(loader.load())
             elif file_type == ".txt":
                 for file in os.listdir(data_dir):
