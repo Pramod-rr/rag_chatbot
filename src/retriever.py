@@ -1,6 +1,6 @@
 import torch
 import logging
-from src.data_preprocessing import load_documents, chunk_documents, get_embeddings
+from data_preprocessing import load_documents, chunk_documents, get_embeddings
 from langchain.vectorstores import FAISS
 
 
@@ -10,8 +10,9 @@ logger = logging.getLogger(__name__)
 def get_retriever(index_dir, search_type="similarity", k=5, use_mmr=False):
     try:
         embeddings = get_embeddings()
-        
-        vectorstore = FAISS.load_local(index_dir, embeddings, allow_dangerous_des = True)
+        vectorstore = FAISS.from_texts(load_documents, embeddings)
+        vectorstore.save_local("models/embeddings/faiss_index_bge_m3")
+        vectorstore = FAISS.load_local(index_dir, embeddings, allow_dangerous_deserialization= True)
         logger.info(f"Loaded FAISS vector store from {index_dir}")
         
         search_kwargs = {"k": k}

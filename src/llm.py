@@ -12,6 +12,7 @@ def get_llm():
     pipe = pipeline(
         "text-generation",
         model="mistralai/Mixtral-7B-Instruct-v0.3",
+        huggingfacehub_api_token=os.getenv("HF_TOKEN"),
         max_new_tokens=512
     )
     return HuggingFacePipeline(pipeline=pipe)

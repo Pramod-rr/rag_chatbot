@@ -1,11 +1,11 @@
 import streamlit as st
-from src.retriever import get_retriever
-from src.llm import get_rag_chain
+from retriever import get_retriever
+from llm import get_rag_chain
 
 st.title("Multilingual RAG Chatbot with bge-m3")
 
 # Load retriever
-retriever = get_retriever("models/embeddings/faiss_index_bge_m3")
+retriever = get_retriever.as_retriever()
 rag_chain = get_rag_chain(retriever)
 
 if "messages" not in st.session_state:
@@ -24,4 +24,4 @@ if prompt := st.chat_input("Ask a question (any language)"):
         with st.spinner("Thinking..."):
             response = rag_chain.run({"question": prompt, "language": "English"})
         st.markdown(response)
-    st.session_state.messages.append({"role Snyder": "assistant", "content": response})
+    st.session_state.messages.append({"role": "assistant", "content": response})

@@ -9,6 +9,8 @@ from langchain.vectorstores import FAISS
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__) 
 
+data_dir="data"
+
 def clean_text(text):
     text = re.sub(r's+'," ",text.strip())
     text = re.sub(r'[^\w\s.,!?]','',text)
@@ -19,7 +21,7 @@ def load_documents(data_dir, file_types=[".pdf",".txt"]):
         documents = []
         for file_type in file_types:
             if file_type == ".pdf":
-                loader = PyPDFDirectoryLoader(data_dir = "data\Introduction to Machine Learning with Python ( PDFDrive ).pdf")
+                loader = PyPDFDirectoryLoader(path=data_dir)
                 documents.extend(loader.load())
             elif file_type == ".txt":
                 for file in os.listdir(data_dir):
@@ -85,3 +87,22 @@ def process_documents(data_dir, output_dir, file_types=[".pdf", ".txt"]):
     
     except Exception as e:
         logger.error(f"Error in document processing: {str(e)}")
+        
+
+if __name__ == "__main__":
+    # Define the directory containing your source documents
+    DATA_DIRECTORY = "data\data.pdf" 
+    
+    # Define the directory where the FAISS index will be saved
+    INDEX_OUTPUT_DIRECTORY = "models/embeddings/faiss_index_bge_m3"
+    
+    print("Starting document processing...")
+    chunks_created = process_documents(
+        data_dir=DATA_DIRECTORY, 
+        output_dir=INDEX_OUTPUT_DIRECTORY
+    )
+    if chunks_created:
+        print(f"Successfully processed documents and created {chunks_created} chunks.")
+        print(f"FAISS index saved to {INDEX_OUTPUT_DIRECTORY}")
+    else:
+        print("Document processing failed. Please check the logs.")
