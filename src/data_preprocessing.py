@@ -1,15 +1,15 @@
 import logging
 import re
 import os
-from langchain.document_loaders import PyPDFDirectoryLoader, TextLoader, UnstructuredAPIFileIOLoader
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__) 
 
-data_dir="data"
+
 
 def clean_text(text):
     text = re.sub(r's+'," ",text.strip())
@@ -18,19 +18,8 @@ def clean_text(text):
 
 def load_documents(data_dir, file_types=[".pdf",".txt"]):
     try:
-        documents = []
-        for file_type in file_types:
-            if file_type == ".pdf":
-                loader = PyPDFDirectoryLoader(path=data_dir)
-                documents.extend(loader.load())
-            elif file_type == ".txt":
-                for file in os.listdir(data_dir):
-                    if file.endswith(".txt"):
-                        loader = TextLoader(data_dir, file)
-                        documents.extend(load_documents.load())
-            elif file_type == ".html":
-                loader = UnstructuredAPIFileIOLoader(data_dir)
-                documents.extend(loader.load())
+        loader = PyPDFLoader(data_dir)
+        documents = loader.load()
         logger.info(f"Loaded {len(documents)} documents from {data_dir}")
         return documents
     except Exception as e:
@@ -69,16 +58,15 @@ def get_embeddings():
         logger.error(f"Error initializing embeddings: {str(e)}")
         raise
     
-def process_documents(data_dir, output_dir, file_types=[".pdf", ".txt"]):
+def process_documents(data_dir, output_dir):
     try:
-        documents = load_documents(data_dir, file_types)
+        documents = load_documents(data_dir)
         if not documents:
             raise ValueError("No documents loaded")
         
         chunks = chunk_documents(documents)
         
         embeddings = get_embeddings()
-        
         vectorstore = FAISS.from_documents(chunks, embeddings)
         os.makedirs(output_dir, exist_ok=True)
         vectorstore.save_local(output_dir)
@@ -91,14 +79,14 @@ def process_documents(data_dir, output_dir, file_types=[".pdf", ".txt"]):
 
 if __name__ == "__main__":
     # Define the directory containing your source documents
-    DATA_DIRECTORY = "data\data.pdf" 
+    data_directory = r"C:\Users\rnmpr\Documents\rag-chatbot\src\mmlbook.pdf"
     
     # Define the directory where the FAISS index will be saved
     INDEX_OUTPUT_DIRECTORY = "models/embeddings/faiss_index_bge_m3"
     
     print("Starting document processing...")
     chunks_created = process_documents(
-        data_dir=DATA_DIRECTORY, 
+        data_dir=data_directory, 
         output_dir=INDEX_OUTPUT_DIRECTORY
     )
     if chunks_created:
