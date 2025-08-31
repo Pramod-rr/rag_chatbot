@@ -93,4 +93,4 @@ if __name__ == "__main__":
         print(f"Successfully processed documents and created {chunks_created} chunks.")
         print(f"FAISS index saved to {INDEX_OUTPUT_DIRECTORY}")
     else:
-        print("Document processing failed. Please check the logs.")
+        print("Document processing failed. Please check the logs.") #
